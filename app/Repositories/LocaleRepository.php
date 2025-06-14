@@ -34,23 +34,36 @@ class LocaleRepository extends BaseRepository implements LocaleRepositoryInterfa
         return $locale;
     }
 
-    public function update(int $id, array $data): ?Model
+    public function update($modelOrId, array $data): ?Model
     {
-        $locale = parent::update($id, $data);
+        $locale = parent::update($modelOrId, $data);
         Cache::forget('active_locales');
         return $locale;
     }
 
-    public function delete(int $id): bool
+    public function delete($modelOrId): bool
     {
-        $result = parent::delete($id);
+        $result = parent::delete($modelOrId);
         Cache::forget('active_locales');
         return $result;
     }
 
     public function getAll(array $filters = []): LengthAwarePaginator
     {
-        return $this->model->paginate();
+        $query = $this->model->query();
+
+        if (isset($filters['search'])) {
+            $query->where(function ($q) use ($filters) {
+                $q->where('name', 'like', "%{$filters['search']}%")
+                    ->orWhere('code', 'like', "%{$filters['search']}%");
+            });
+        }
+
+        if (isset($filters['is_active'])) {
+            $query->where('is_active', $filters['is_active']);
+        }
+
+        return $query->paginate($filters['per_page'] ?? 15);
     }
 
     public function restore(int $id): ?Model

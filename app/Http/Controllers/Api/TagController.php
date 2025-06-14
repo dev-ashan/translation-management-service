@@ -3,14 +3,13 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Api\Tag\StoreTagRequest;
-use App\Http\Requests\Api\Tag\UpdateTagRequest;
+use App\Http\Requests\Api\Tag\TagRequest;
 use App\Http\Resources\TagResource;
 use App\Models\Tag;
 use App\Services\TagService;
 use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Http\Request;
 
 /**
  * @OA\Tag(
@@ -22,9 +21,12 @@ class TagController extends Controller
 {
     use ApiResponse;
 
-    public function __construct(
-        protected TagService $tagService
-    ) {}
+    protected TagService $tagService;
+
+    public function __construct(TagService $tagService)
+    {
+        $this->tagService = $tagService;
+    }
 
     /**
      * @OA\Get(
@@ -54,10 +56,13 @@ class TagController extends Controller
      *     )
      * )
      */
-    public function index(): AnonymousResourceCollection
+    public function index(Request $request): JsonResponse
     {
-        $tags = $this->tagService->getAll();
-        return TagResource::collection($tags);
+        $tags = $this->tagService->getAllTags($request->all());
+        return $this->successResponse(
+            TagResource::collection($tags),
+            'Tags retrieved successfully'
+        );
     }
 
     /**
@@ -106,13 +111,12 @@ class TagController extends Controller
      *     )
      * )
      */
-    public function store(StoreTagRequest $request): JsonResponse
+    public function store(TagRequest $request): JsonResponse
     {
-        $tag = $this->tagService->create($request->validated());
-        return $this->successResponse(
+        $tag = $this->tagService->createTag($request->validated());
+        return $this->createdResponse(
             new TagResource($tag),
-            'Tag created successfully',
-            201
+            'Tag created successfully'
         );
     }
 
@@ -212,9 +216,9 @@ class TagController extends Controller
      *     )
      * )
      */
-    public function update(UpdateTagRequest $request, Tag $tag): JsonResponse
+    public function update(TagRequest $request, Tag $tag): JsonResponse
     {
-        $updatedTag = $this->tagService->update($tag, $request->validated());
+        $updatedTag = $this->tagService->updateTag($tag->id, $request->validated());
         return $this->successResponse(
             new TagResource($updatedTag),
             'Tag updated successfully'
@@ -254,7 +258,10 @@ class TagController extends Controller
      */
     public function destroy(Tag $tag): JsonResponse
     {
-        $this->tagService->delete($tag);
-        return $this->successResponse(null, 'Tag deleted successfully');
+        $this->tagService->deleteTag($tag->id);
+        return $this->successResponse(
+            null,
+            'Tag deleted successfully'
+        );
     }
 } 

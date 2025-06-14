@@ -28,4 +28,14 @@ class TagRepository extends BaseRepository implements TagRepositoryInterface
         }
         return null;
     }
+
+    public function update($tag, array $data): ?Model
+    {
+        return parent::update($tag, $data);
+    }
+
+    public function delete($tag): bool
+    {
+        return parent::delete($tag);
+    }
 } 

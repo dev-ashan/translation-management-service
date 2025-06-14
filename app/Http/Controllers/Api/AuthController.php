@@ -9,6 +9,8 @@ use App\Http\Resources\UserResource;
 use App\Services\AuthService;
 use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\ValidationException;
 
 /**
  * @OA\Tag(
@@ -20,9 +22,12 @@ class AuthController extends Controller
 {
     use ApiResponse;
 
-    public function __construct(
-        protected AuthService $authService
-    ) {}
+    protected $authService;
+
+    public function __construct(AuthService $authService)
+    {
+        $this->authService = $authService;
+    }
 
     /**
      * @OA\Post(
@@ -74,11 +79,12 @@ class AuthController extends Controller
     public function register(RegisterRequest $request): JsonResponse
     {
         $user = $this->authService->register($request->validated());
-        return $this->successResponse(
-            new UserResource($user),
-            'User registered successfully',
-            201
-        );
+        $token = $user->createToken('auth_token')->plainTextToken;
+
+        return $this->createdResponse([
+            'user' => new UserResource($user),
+            'token' => $token
+        ], 'User registered successfully');
     }
 
     /**
@@ -126,8 +132,15 @@ class AuthController extends Controller
      */
     public function login(LoginRequest $request): JsonResponse
     {
-        $result = $this->authService->login($request->validated());
-        return $this->successResponse($result, 'Login successful');
+        try {
+            $token = $this->authService->login($request->validated());
+            return $this->successResponse([
+                'user' => new UserResource(Auth::user()),
+                'token' => $token
+            ], 'User logged in successfully');
+        } catch (ValidationException $e) {
+            return $this->validationErrorResponse($e->errors());
+        }
     }
 
     /**
@@ -165,10 +178,8 @@ class AuthController extends Controller
      */
     public function profile(): JsonResponse
     {
-        return $this->successResponse(
-            new UserResource(auth()->user()),
-            'User profile retrieved successfully'
-        );
+        $user = $this->authService->getProfile();
+        return $this->successResponse(new UserResource($user), 'User profile retrieved successfully');
     }
 
     /**
@@ -198,6 +209,6 @@ class AuthController extends Controller
     public function logout(): JsonResponse
     {
         $this->authService->logout();
-        return $this->successResponse(null, 'Logged out successfully');
+        return $this->successResponse(null, 'User logged out successfully');
     }
 } 

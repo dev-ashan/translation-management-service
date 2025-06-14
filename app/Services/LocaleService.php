@@ -3,16 +3,16 @@
 namespace App\Services;
 
 use App\Models\Locale;
-use App\Repositories\Interfaces\LocaleRepositoryInterface;
+use App\Repositories\LocaleRepository;
 use App\Services\Interfaces\LocaleServiceInterface;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 class LocaleService implements LocaleServiceInterface
 {
-    protected $localeRepository;
+    protected LocaleRepository $localeRepository;
 
-    public function __construct(LocaleRepositoryInterface $localeRepository)
+    public function __construct(LocaleRepository $localeRepository)
     {
         $this->localeRepository = $localeRepository;
     }
@@ -39,16 +39,6 @@ class LocaleService implements LocaleServiceInterface
 
     public function deleteLocale(int $id): bool
     {
-        $locale = $this->getLocaleById($id);
-        
-        if ($locale->is_default) {
-            throw new \Exception('Cannot delete default locale');
-        }
-
-        if ($locale->is_active) {
-            throw new \Exception('Cannot delete active locale');
-        }
-
         return $this->localeRepository->delete($id);
     }
 
@@ -62,7 +52,7 @@ class LocaleService implements LocaleServiceInterface
         return $this->localeRepository->getActiveLocales();
     }
 
-    public function findByCode(string $code)
+    public function findByCode(string $code): ?Locale
     {
         return $this->localeRepository->findByCode($code);
     }

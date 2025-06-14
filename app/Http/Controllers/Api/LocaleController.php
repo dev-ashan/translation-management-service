@@ -3,14 +3,13 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Api\Locale\StoreLocaleRequest;
-use App\Http\Requests\Api\Locale\UpdateLocaleRequest;
+use App\Http\Requests\Api\Locale\LocaleRequest;
 use App\Http\Resources\LocaleResource;
 use App\Models\Locale;
 use App\Services\LocaleService;
 use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Http\Request;
 
 /**
  * @OA\Tag(
@@ -22,9 +21,12 @@ class LocaleController extends Controller
 {
     use ApiResponse;
 
-    public function __construct(
-        protected LocaleService $localeService
-    ) {}
+    protected LocaleService $localeService;
+
+    public function __construct(LocaleService $localeService)
+    {
+        $this->localeService = $localeService;
+    }
 
     /**
      * @OA\Get(
@@ -56,10 +58,13 @@ class LocaleController extends Controller
      *     )
      * )
      */
-    public function index(): AnonymousResourceCollection
+    public function index(Request $request): JsonResponse
     {
-        $locales = $this->localeService->getAll();
-        return LocaleResource::collection($locales);
+        $locales = $this->localeService->getAllLocales($request->all());
+        return $this->successResponse(
+            LocaleResource::collection($locales),
+            'Locales retrieved successfully'
+        );
     }
 
     /**
@@ -111,13 +116,12 @@ class LocaleController extends Controller
      *     )
      * )
      */
-    public function store(StoreLocaleRequest $request): JsonResponse
+    public function store(LocaleRequest $request): JsonResponse
     {
-        $locale = $this->localeService->create($request->validated());
-        return $this->successResponse(
+        $locale = $this->localeService->createLocale($request->validated());
+        return $this->createdResponse(
             new LocaleResource($locale),
-            'Locale created successfully',
-            201
+            'Locale created successfully'
         );
     }
 
@@ -222,9 +226,9 @@ class LocaleController extends Controller
      *     )
      * )
      */
-    public function update(UpdateLocaleRequest $request, Locale $locale): JsonResponse
+    public function update(LocaleRequest $request, Locale $locale): JsonResponse
     {
-        $updatedLocale = $this->localeService->update($locale, $request->validated());
+        $updatedLocale = $this->localeService->updateLocale($locale->id, $request->validated());
         return $this->successResponse(
             new LocaleResource($updatedLocale),
             'Locale updated successfully'
@@ -264,8 +268,11 @@ class LocaleController extends Controller
      */
     public function destroy(Locale $locale): JsonResponse
     {
-        $this->localeService->delete($locale);
-        return $this->successResponse(null, 'Locale deleted successfully');
+        $this->localeService->deleteLocale($locale->id);
+        return $this->successResponse(
+            null,
+            'Locale deleted successfully'
+        );
     }
 
     /**
@@ -313,7 +320,7 @@ class LocaleController extends Controller
      */
     public function restore(Locale $locale): JsonResponse
     {
-        $restoredLocale = $this->localeService->restore($locale);
+        $restoredLocale = $this->localeService->restoreLocale($locale->id);
         return $this->successResponse(
             new LocaleResource($restoredLocale),
             'Locale restored successfully'

@@ -3,15 +3,15 @@
 namespace App\Services;
 
 use App\Models\Tag;
-use App\Repositories\Interfaces\TagRepositoryInterface;
+use App\Repositories\TagRepository;
 use App\Services\Interfaces\TagServiceInterface;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 class TagService implements TagServiceInterface
 {
-    protected $tagRepository;
+    protected TagRepository $tagRepository;
 
-    public function __construct(TagRepositoryInterface $tagRepository)
+    public function __construct(TagRepository $tagRepository)
     {
         $this->tagRepository = $tagRepository;
     }

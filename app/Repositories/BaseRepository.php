@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use App\Repositories\Interfaces\RepositoryInterface;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 abstract class BaseRepository implements RepositoryInterface
 {
@@ -35,9 +36,9 @@ abstract class BaseRepository implements RepositoryInterface
         return $this->model->create($data);
     }
 
-    public function update(int $id, array $data): ?Model
+    public function update($modelOrId, array $data): ?Model
     {
-        $record = $this->find($id);
+        $record = $modelOrId instanceof Model ? $modelOrId : $this->find($modelOrId);
         if ($record) {
             $record->update($data);
             return $record;
@@ -45,9 +46,13 @@ abstract class BaseRepository implements RepositoryInterface
         return null;
     }
 
-    public function delete(int $id): bool
+    public function delete($modelOrId): bool
     {
-        return $this->model->destroy($id);
+        $record = $modelOrId instanceof Model ? $modelOrId : $this->find($modelOrId);
+        if ($record) {
+            return $record->delete();
+        }
+        return false;
     }
 
     public function findBy(array $criteria)
@@ -58,5 +63,10 @@ abstract class BaseRepository implements RepositoryInterface
     public function findOneBy(array $criteria)
     {
         return $this->model->where($criteria)->first();
+    }
+
+    public function paginate(int $perPage = 15): LengthAwarePaginator
+    {
+        return $this->model->paginate($perPage);
     }
 } 

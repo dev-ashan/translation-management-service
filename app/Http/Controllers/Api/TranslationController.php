@@ -6,12 +6,10 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\Translation\TranslationRequest;
 use App\Http\Resources\TranslationResource;
 use App\Models\Translation;
-use App\Repositories\TranslationRepository;
 use App\Services\TranslationService;
 use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 /**
  * @OA\Tag(
@@ -23,16 +21,16 @@ class TranslationController extends Controller
 {
     use ApiResponse;
 
+    protected TranslationService $translationService;
+
     /**
      * Create a new controller instance.
      *
      * @param TranslationService $translationService The translation service instance
-     * @param TranslationRepository $translationRepository The translation repository instance
      */
-    public function __construct(
-        protected TranslationService $translationService,
-        protected TranslationRepository $translationRepository
-    ) {
+    public function __construct(TranslationService $translationService)
+    {
+        $this->translationService = $translationService;
         $this->middleware('auth:sanctum');
     }
 
@@ -102,10 +100,13 @@ class TranslationController extends Controller
      *     )
      * )
      */
-    public function index(Request $request): AnonymousResourceCollection
+    public function index(Request $request): JsonResponse
     {
-        $translations = $this->translationRepository->getAll($request->all());
-        return TranslationResource::collection($translations);
+        $translations = $this->translationService->getAll($request->all());
+        return $this->successResponse(
+            TranslationResource::collection($translations),
+            'Translations retrieved successfully'
+        );
     }
 
     /**
@@ -173,10 +174,9 @@ class TranslationController extends Controller
     public function store(TranslationRequest $request): JsonResponse
     {
         $translation = $this->translationService->createTranslation($request->validated());
-        return $this->successResponse(
+        return $this->createdResponse(
             new TranslationResource($translation),
-            'Translation created successfully',
-            201
+            'Translation created successfully'
         );
     }
 
@@ -303,7 +303,7 @@ class TranslationController extends Controller
      */
     public function update(TranslationRequest $request, Translation $translation): JsonResponse
     {
-        $updatedTranslation = $this->translationService->update($translation, $request->validated());
+        $updatedTranslation = $this->translationService->update($translation->id, $request->validated());
         return $this->successResponse(
             new TranslationResource($updatedTranslation),
             'Translation updated successfully'
@@ -393,10 +393,10 @@ class TranslationController extends Controller
      */
     public function search(Request $request): JsonResponse
     {
-        $results = $this->translationService->search($request->get('q'));
+        $translations = $this->translationService->search($request->get('q', ''));
         return $this->successResponse(
-            TranslationResource::collection($results),
-            'Search results retrieved successfully'
+            TranslationResource::collection($translations),
+            'Translations retrieved successfully'
         );
     }
 } 

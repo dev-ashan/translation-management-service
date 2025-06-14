@@ -18,11 +18,11 @@ trait ApiResponse
      * @param int $code
      * @return JsonResponse
      */
-    protected function successResponse($data, string $message, string $resource = null, int $code = 200): JsonResponse
+    protected function successResponse($data, string $message = null, int $code = 200): JsonResponse
     {
         $response = [
             'success' => true,
-            'message' => $resource ? __("api.success.{$message}", ['resource' => __("api.resources.{$resource}")]) : __("api.success.{$message}"),
+            'message' => $message,
             'data' => $data
         ];
 
@@ -33,6 +33,14 @@ trait ApiResponse
                 'per_page' => $data->resource->perPage(),
                 'total' => $data->resource->total(),
             ];
+        } elseif ($data instanceof LengthAwarePaginator) {
+            $response['meta'] = [
+                'current_page' => $data->currentPage(),
+                'last_page' => $data->lastPage(),
+                'per_page' => $data->perPage(),
+                'total' => $data->total(),
+            ];
+            $response['data'] = $data->items();
         }
 
         return response()->json($response, $code);
@@ -47,18 +55,12 @@ trait ApiResponse
      * @param array $errors
      * @return JsonResponse
      */
-    protected function errorResponse(string $message, string $resource = null, int $code = 400, array $errors = []): JsonResponse
+    protected function errorResponse(string $message, int $code): JsonResponse
     {
-        $response = [
+        return response()->json([
             'success' => false,
-            'message' => $resource ? __("api.error.{$message}", ['resource' => __("api.resources.{$resource}")]) : __("api.error.{$message}"),
-        ];
-
-        if (!empty($errors)) {
-            $response['errors'] = $errors;
-        }
-
-        return response()->json($response, $code);
+            'message' => $message
+        ], $code);
     }
 
     /**
@@ -69,7 +71,7 @@ trait ApiResponse
      */
     protected function notFoundResponse(string $resource): JsonResponse
     {
-        return $this->errorResponse('not_found', $resource, 404);
+        return $this->errorResponse('not_found', 404);
     }
 
     /**
@@ -80,7 +82,11 @@ trait ApiResponse
      */
     protected function validationErrorResponse(array $errors): JsonResponse
     {
-        return $this->errorResponse('validation_failed', null, 422, $errors);
+        return response()->json([
+            'success' => false,
+            'message' => 'The given data was invalid',
+            'errors' => $errors
+        ], 422);
     }
 
     /**
@@ -90,7 +96,7 @@ trait ApiResponse
      */
     protected function unauthorizedResponse(): JsonResponse
     {
-        return $this->errorResponse('unauthorized', null, 401);
+        return $this->errorResponse('unauthorized', 401);
     }
 
     /**
@@ -100,7 +106,7 @@ trait ApiResponse
      */
     protected function forbiddenResponse(): JsonResponse
     {
-        return $this->errorResponse('forbidden', null, 403);
+        return $this->errorResponse('forbidden', 403);
     }
 
     /**
@@ -110,6 +116,18 @@ trait ApiResponse
      */
     protected function serverErrorResponse(): JsonResponse
     {
-        return $this->errorResponse('server_error', null, 500);
+        return $this->errorResponse('server_error', 500);
+    }
+
+    /**
+     * Return a created response.
+     *
+     * @param mixed $data
+     * @param string $message
+     * @return JsonResponse
+     */
+    protected function createdResponse($data, string $message = null): JsonResponse
+    {
+        return $this->successResponse($data, $message, 201);
     }
 } 

@@ -56,6 +56,27 @@ interface RepositoryInterface
      */
     public function restore(int $id): ?Model;
 
+    /**
+     * Find records by criteria
+     *
+     * @param array $criteria
+     * @return mixed
+     */
     public function findBy(array $criteria);
+
+    /**
+     * Find one record by criteria
+     *
+     * @param array $criteria
+     * @return mixed
+     */
     public function findOneBy(array $criteria);
+
+    /**
+     * Get paginated records
+     *
+     * @param int $perPage
+     * @return LengthAwarePaginator
+     */
+    public function paginate(int $perPage = 15): LengthAwarePaginator;
 } 
