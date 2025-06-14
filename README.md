@@ -6,7 +6,7 @@ A Laravel-based translation management system with RESTful API for managing tran
 
 ```bash
 # Clone and install
-git clone [repository-url]
+git clone https://github.com/beingahsan/translation-management-service.git
 cd translation-management-service
 composer install
 cp .env.example .env
@@ -22,6 +22,25 @@ DB_PASSWORD=your_password
 
 # Setup database
 php artisan migrate --seed
+```
+
+## Docker Setup
+
+```bash
+# Build and start containers
+docker-compose up -d
+
+# Install dependencies
+docker-compose exec app composer install
+
+# Generate key
+docker-compose exec app php artisan key:generate
+
+# Run migrations
+docker-compose exec app php artisan migrate --seed
+
+# Access the application
+http://localhost:8000
 ```
 
 ## Key Features
@@ -41,11 +60,14 @@ Access at: `http://localhost:8000/api/documentation`
 ## Available Commands
 
 ```bash
-# Generate test data
-php artisan generate:test-data
+# Generate translations from language files
+php artisan translations:generate
 
 # Clear translation cache
 php artisan translations:clear-cache
+
+# Generate test data
+php artisan generate:test-data
 ```
 
 ## Testing
@@ -99,6 +121,7 @@ app/
 - MySQL >= 8.0
 - Composer
 - Node.js & NPM
+- Docker & Docker Compose (optional)
 
 ## License
 
