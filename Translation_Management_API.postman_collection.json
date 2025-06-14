@@ -1,0 +1,548 @@
+{
+    "info": {
+        "_postman_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+        "name": "Translation Management API",
+        "description": "API collection for the Translation Management Service",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [{
+            "name": "Authentication",
+            "item": [{
+                    "name": "Register",
+                    "request": {
+                        "method": "POST",
+                        "header": [{
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"name\": \"Test User\",\n    \"email\": \"test@example.com\",\n    \"password\": \"password123\",\n    \"password_confirmation\": \"password123\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/auth/register",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "v1", "auth", "register"]
+                        },
+                        "description": "Register a new user"
+                    }
+                },
+                {
+                    "name": "Login",
+                    "request": {
+                        "method": "POST",
+                        "header": [{
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"email\": \"test@example.com\",\n    \"password\": \"password123\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/auth/login",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "v1", "auth", "login"]
+                        },
+                        "description": "Login and get access token"
+                    }
+                },
+                {
+                    "name": "Get Profile",
+                    "request": {
+                        "method": "GET",
+                        "header": [{
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/auth/profile",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "v1", "auth", "profile"]
+                        },
+                        "description": "Get authenticated user profile"
+                    }
+                },
+                {
+                    "name": "Logout",
+                    "request": {
+                        "method": "POST",
+                        "header": [{
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/auth/logout",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "v1", "auth", "logout"]
+                        },
+                        "description": "Logout and invalidate token"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Translations",
+            "item": [{
+                    "name": "List Translations",
+                    "request": {
+                        "method": "GET",
+                        "header": [{
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/translations?locale=en&tags=important&query=welcome",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "v1", "translations"],
+                            "query": [{
+                                    "key": "locale",
+                                    "value": "en",
+                                    "description": "Filter by locale code"
+                                },
+                                {
+                                    "key": "tags",
+                                    "value": "important",
+                                    "description": "Filter by tag names (comma-separated)"
+                                },
+                                {
+                                    "key": "query",
+                                    "value": "welcome",
+                                    "description": "Search in key and value"
+                                }
+                            ]
+                        },
+                        "description": "List translations with optional filters"
+                    }
+                },
+                {
+                    "name": "Create Translation",
+                    "request": {
+                        "method": "POST",
+                        "header": [{
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}",
+                                "type": "text"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"locale_id\": 1,\n    \"key\": \"welcome.message\",\n    \"value\": \"Welcome to our application!\",\n    \"group\": \"general\",\n    \"tags\": [1, 2]\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/translations",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "v1", "translations"]
+                        },
+                        "description": "Create a new translation"
+                    }
+                },
+                {
+                    "name": "Get Translation",
+                    "request": {
+                        "method": "GET",
+                        "header": [{
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/translations/1",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "v1", "translations", "1"]
+                        },
+                        "description": "Get a specific translation"
+                    }
+                },
+                {
+                    "name": "Update Translation",
+                    "request": {
+                        "method": "PUT",
+                        "header": [{
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}",
+                                "type": "text"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"locale_id\": 1,\n    \"key\": \"welcome.message\",\n    \"value\": \"Welcome to our updated application!\",\n    \"group\": \"general\",\n    \"tags\": [1, 2]\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/translations/1",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "v1", "translations", "1"]
+                        },
+                        "description": "Update a translation"
+                    }
+                },
+                {
+                    "name": "Delete Translation",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [{
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/translations/1",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "v1", "translations", "1"]
+                        },
+                        "description": "Delete a translation"
+                    }
+                },
+                {
+                    "name": "Search Translations",
+                    "request": {
+                        "method": "GET",
+                        "header": [{
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/translations/search?q=welcome",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "v1", "translations", "search"],
+                            "query": [{
+                                "key": "q",
+                                "value": "welcome",
+                                "description": "Search query"
+                            }]
+                        },
+                        "description": "Search translations by key or value"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Locales",
+            "item": [{
+                    "name": "List Locales",
+                    "request": {
+                        "method": "GET",
+                        "header": [{
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/locales",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "v1", "locales"]
+                        },
+                        "description": "List all locales"
+                    }
+                },
+                {
+                    "name": "Create Locale",
+                    "request": {
+                        "method": "POST",
+                        "header": [{
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}",
+                                "type": "text"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"code\": \"fr\",\n    \"name\": \"French\",\n    \"is_active\": true\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/locales",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "v1", "locales"]
+                        },
+                        "description": "Create a new locale"
+                    }
+                },
+                {
+                    "name": "Update Locale",
+                    "request": {
+                        "method": "PUT",
+                        "header": [{
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}",
+                                "type": "text"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"code\": \"fr\",\n    \"name\": \"French (Updated)\",\n    \"is_active\": true\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/locales/1",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "v1", "locales", "1"]
+                        },
+                        "description": "Update a locale"
+                    }
+                },
+                {
+                    "name": "Delete Locale",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [{
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/locales/1",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "v1", "locales", "1"]
+                        },
+                        "description": "Delete a locale"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Tags",
+            "item": [{
+                    "name": "List Tags",
+                    "request": {
+                        "method": "GET",
+                        "header": [{
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/tags",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "v1", "tags"]
+                        },
+                        "description": "List all tags"
+                    }
+                },
+                {
+                    "name": "Create Tag",
+                    "request": {
+                        "method": "POST",
+                        "header": [{
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}",
+                                "type": "text"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"name\": \"Important\",\n    \"description\": \"Important translations\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/tags",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "v1", "tags"]
+                        },
+                        "description": "Create a new tag"
+                    }
+                },
+                {
+                    "name": "Update Tag",
+                    "request": {
+                        "method": "PUT",
+                        "header": [{
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}",
+                                "type": "text"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"name\": \"Important (Updated)\",\n    \"description\": \"Updated important translations\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/tags/1",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "v1", "tags", "1"]
+                        },
+                        "description": "Update a tag"
+                    }
+                },
+                {
+                    "name": "Delete Tag",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [{
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/tags/1",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "v1", "tags", "1"]
+                        },
+                        "description": "Delete a tag"
+                    }
+                }
+            ]
+        }
+    ],
+    "event": [{
+            "listen": "prerequest",
+            "script": {
+                "type": "text/javascript",
+                "exec": [""]
+            }
+        },
+        {
+            "listen": "test",
+            "script": {
+                "type": "text/javascript",
+                "exec": [""]
+            }
+        }
+    ],
+    "variable": [{
+            "key": "base_url",
+            "value": "http://localhost:8000",
+            "type": "string"
+        },
+        {
+            "key": "token",
+            "value": "your_access_token_here",
+            "type": "string"
+        }
+    ]
+}
