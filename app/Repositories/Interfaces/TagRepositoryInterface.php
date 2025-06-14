@@ -2,6 +2,7 @@
 
 namespace App\Repositories\Interfaces;
 
+use App\Models\Tag;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Pagination\LengthAwarePaginator;
 
@@ -55,4 +56,12 @@ interface TagRepositoryInterface
      * @return Model|null
      */
     public function restore(int $id): ?Model;
+
+    /**
+     * Find a tag by name
+     *
+     * @param string $name
+     * @return Tag|null
+     */
+    public function findByName(string $name): ?Tag;
 } 

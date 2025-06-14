@@ -6,9 +6,10 @@ use App\Models\Translation;
 use App\Repositories\Interfaces\TranslationRepositoryInterface;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
 
 /**
  * Repository class for managing translation data access
@@ -16,16 +17,17 @@ use Illuminate\Database\Eloquent\Collection;
  * This class handles all database operations related to translations,
  * including CRUD operations, filtering, and relationship management.
  */
-class TranslationRepository implements TranslationRepositoryInterface
+class TranslationRepository extends BaseRepository implements TranslationRepositoryInterface
 {
     /**
      * Create a new translation repository instance.
      *
      * @param Translation $model The translation model instance
      */
-    public function __construct(
-        protected Translation $model
-    ) {}
+    public function __construct(Translation $model)
+    {
+        parent::__construct($model);
+    }
 
     /**
      * Get all translations with filters
@@ -151,7 +153,7 @@ class TranslationRepository implements TranslationRepositoryInterface
     /**
      * Update an existing translation
      *
-     * @param Translation $translation The translation to update
+     * @param mixed $modelOrId The translation model or ID
      * @param array $data The updated translation data
      *                    - locale_id: The ID of the locale
      *                    - key: The translation key
@@ -160,8 +162,13 @@ class TranslationRepository implements TranslationRepositoryInterface
      * @return Translation|null The updated translation model or null on failure
      * @throws \Exception If the update fails
      */
-    public function update(Translation $translation, array $data): ?Translation
+    public function update($modelOrId, array $data): ?Translation
     {
+        $translation = $modelOrId instanceof Model ? $modelOrId : $this->find($modelOrId);
+        if (!$translation) {
+            return null;
+        }
+
         DB::beginTransaction();
         try {
             $translation->update($data);
@@ -180,12 +187,32 @@ class TranslationRepository implements TranslationRepositoryInterface
     /**
      * Delete a translation
      *
-     * @param Translation $translation The translation to delete
+     * @param mixed $modelOrId The translation model or ID
      * @return bool True if the deletion was successful
      */
-    public function delete(Translation $translation): bool
+    public function delete($modelOrId): bool
     {
+        $translation = $modelOrId instanceof Model ? $modelOrId : $this->find($modelOrId);
+        if (!$translation) {
+            return false;
+        }
         return $translation->delete();
+    }
+
+    /**
+     * Restore a soft-deleted translation
+     *
+     * @param int $id The ID of the translation to restore
+     * @return Translation|null The restored translation or null if not found
+     */
+    public function restore(int $id): ?Translation
+    {
+        $translation = $this->model->withTrashed()->find($id);
+        if ($translation) {
+            $translation->restore();
+            return $translation;
+        }
+        return null;
     }
 
     /**
@@ -219,5 +246,15 @@ class TranslationRepository implements TranslationRepositoryInterface
     public function findByKey(string $key): Collection
     {
         return $this->model->where('key', $key)->get();
+    }
+
+    public function find(int $id): ?Model
+    {
+        return $this->findById($id);
+    }
+
+    public function all(): Collection
+    {
+        return $this->model->with(['locale', 'tags'])->get();
     }
 } 

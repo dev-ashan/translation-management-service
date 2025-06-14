@@ -21,9 +21,9 @@ class TranslationService implements TranslationServiceInterface
     /**
      * Get all translations with optional filters
      */
-    public function getAll(array $params = []): LengthAwarePaginator
+    public function getAllTranslations(array $filters = []): LengthAwarePaginator
     {
-        return $this->translationRepository->getAll($params);
+        return $this->translationRepository->getAll($filters);
     }
 
     /**
@@ -63,8 +63,12 @@ class TranslationService implements TranslationServiceInterface
     /**
      * Delete a translation
      */
-    public function delete(Translation $translation): bool
+    public function deleteTranslation(int $id): bool
     {
+        $translation = $this->translationRepository->findById($id);
+        if (!$translation) {
+            return false;
+        }
         $deleted = $this->translationRepository->delete($translation);
         if ($deleted) {
             $this->clearTranslationCache($translation->locale_id);
@@ -75,9 +79,9 @@ class TranslationService implements TranslationServiceInterface
     /**
      * Search translations
      */
-    public function search(string $query): LengthAwarePaginator
+    public function searchTranslations(string $query): LengthAwarePaginator
     {
-        return $this->getAll(['query' => $query]);
+        return $this->getAllTranslations(['query' => $query]);
     }
 
     /**
@@ -99,29 +103,9 @@ class TranslationService implements TranslationServiceInterface
     /**
      * Clear translation cache for a specific locale
      */
-    protected function clearTranslationCache(int $localeId): void
+    public function clearTranslationCache(int $localeId): void
     {
         Cache::forget("translations_locale_{$localeId}");
         Cache::forget('translations_export_all');
-    }
-
-    // Alias interface methods for compatibility
-    public function getAllTranslations(array $filters = []): LengthAwarePaginator
-    {
-        return $this->getAll($filters);
-    }
-
-    public function deleteTranslation(int $id): bool
-    {
-        $translation = $this->translationRepository->findById($id);
-        if (!$translation) {
-            return false;
-        }
-        return $this->translationRepository->delete($translation);
-    }
-
-    public function searchTranslations(string $query): LengthAwarePaginator
-    {
-        return $this->search($query);
     }
 } 

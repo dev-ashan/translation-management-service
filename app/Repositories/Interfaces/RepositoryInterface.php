@@ -4,9 +4,17 @@ namespace App\Repositories\Interfaces;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Collection;
 
 interface RepositoryInterface
 {
+    /**
+     * Get all records
+     *
+     * @return Collection
+     */
+    public function all(): Collection;
+
     /**
      * Get all records with pagination and filters
      *
@@ -19,9 +27,9 @@ interface RepositoryInterface
      * Find a record by ID
      *
      * @param int $id
-     * @return mixed
+     * @return Model|null
      */
-    public function find(int $id);
+    public function find(int $id): ?Model;
 
     /**
      * Create a new record
@@ -34,19 +42,19 @@ interface RepositoryInterface
     /**
      * Update a record
      *
-     * @param int $id
+     * @param mixed $modelOrId
      * @param array $data
      * @return Model|null
      */
-    public function update(int $id, array $data): ?Model;
+    public function update($modelOrId, array $data): ?Model;
 
     /**
      * Delete a record
      *
-     * @param int $id
+     * @param mixed $modelOrId
      * @return bool
      */
-    public function delete(int $id): bool;
+    public function delete($modelOrId): bool;
 
     /**
      * Restore a soft-deleted record
@@ -60,17 +68,17 @@ interface RepositoryInterface
      * Find records by criteria
      *
      * @param array $criteria
-     * @return mixed
+     * @return Collection
      */
-    public function findBy(array $criteria);
+    public function findBy(array $criteria): Collection;
 
     /**
      * Find one record by criteria
      *
      * @param array $criteria
-     * @return mixed
+     * @return Model|null
      */
-    public function findOneBy(array $criteria);
+    public function findOneBy(array $criteria): ?Model;
 
     /**
      * Get paginated records

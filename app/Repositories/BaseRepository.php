@@ -5,6 +5,7 @@ namespace App\Repositories;
 use App\Repositories\Interfaces\RepositoryInterface;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Collection;
 
 abstract class BaseRepository implements RepositoryInterface
 {
@@ -15,9 +16,14 @@ abstract class BaseRepository implements RepositoryInterface
         $this->model = $model;
     }
 
-    public function all()
+    public function all(): Collection
     {
         return $this->model->all();
+    }
+
+    public function getAll(array $filters = []): LengthAwarePaginator
+    {
+        return $this->model->paginate();
     }
 
     /**
@@ -55,12 +61,12 @@ abstract class BaseRepository implements RepositoryInterface
         return false;
     }
 
-    public function findBy(array $criteria)
+    public function findBy(array $criteria): Collection
     {
         return $this->model->where($criteria)->get();
     }
 
-    public function findOneBy(array $criteria)
+    public function findOneBy(array $criteria): ?Model
     {
         return $this->model->where($criteria)->first();
     }

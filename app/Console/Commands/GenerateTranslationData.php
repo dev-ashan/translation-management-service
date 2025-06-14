@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Log;
 
 class GenerateTranslationData extends Command
 {
-    protected $signature = 'translation:generate {count=150000}';
+    protected $signature = 'translations:generate {count=150000}';
     protected $description = 'Generate translation data with performance monitoring';
 
     public function handle()

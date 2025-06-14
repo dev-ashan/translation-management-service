@@ -3,7 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Api\Translation\TranslationRequest;
+use App\Http\Requests\Api\Translation\StoreTranslationRequest;
+use App\Http\Requests\Api\Translation\UpdateTranslationRequest;
 use App\Http\Resources\TranslationResource;
 use App\Models\Translation;
 use App\Services\TranslationService;
@@ -102,7 +103,7 @@ class TranslationController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
-        $translations = $this->translationService->getAll($request->all());
+        $translations = $this->translationService->getAllTranslations($request->all());
         return $this->successResponse(
             TranslationResource::collection($translations),
             'Translations retrieved successfully'
@@ -171,7 +172,7 @@ class TranslationController extends Controller
      *     )
      * )
      */
-    public function store(TranslationRequest $request): JsonResponse
+    public function store(StoreTranslationRequest $request): JsonResponse
     {
         $translation = $this->translationService->createTranslation($request->validated());
         return $this->createdResponse(
@@ -301,7 +302,7 @@ class TranslationController extends Controller
      *     )
      * )
      */
-    public function update(TranslationRequest $request, Translation $translation): JsonResponse
+    public function update(UpdateTranslationRequest $request, Translation $translation): JsonResponse
     {
         $updatedTranslation = $this->translationService->update($translation->id, $request->validated());
         return $this->successResponse(
@@ -343,7 +344,7 @@ class TranslationController extends Controller
      */
     public function destroy(Translation $translation): JsonResponse
     {
-        $this->translationService->delete($translation);
+        $this->translationService->deleteTranslation($translation->id);
         return $this->successResponse(null, 'Translation deleted successfully');
     }
 
@@ -393,7 +394,7 @@ class TranslationController extends Controller
      */
     public function search(Request $request): JsonResponse
     {
-        $translations = $this->translationService->search($request->get('q', ''));
+        $translations = $this->translationService->searchTranslations($request->get('q', ''));
         return $this->successResponse(
             TranslationResource::collection($translations),
             'Translations retrieved successfully'

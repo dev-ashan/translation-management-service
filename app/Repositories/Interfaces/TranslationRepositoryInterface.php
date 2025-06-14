@@ -2,40 +2,14 @@
 
 namespace App\Repositories\Interfaces;
 
-use App\Models\Translation;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 
-interface TranslationRepositoryInterface
+interface TranslationRepositoryInterface extends RepositoryInterface
 {
-    /**
-     * Get all translations with optional filters
-     */
-    public function getAll(array $filters = []): LengthAwarePaginator;
-
     /**
      * Find a translation by ID
      */
-    public function findById(int $id): ?Translation;
-
-    /**
-     * Create a new translation
-     */
-    public function create(array $data): Translation;
-
-    /**
-     * Update an existing translation
-     *
-     * @param Translation $translation
-     * @param array $data
-     * @return Translation|null
-     */
-    public function update(Translation $translation, array $data): ?Translation;
-
-    /**
-     * Delete a translation
-     */
-    public function delete(Translation $translation): bool;
+    public function findById(int $id);
 
     /**
      * Find translations by locale ID
